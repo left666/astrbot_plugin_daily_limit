@@ -2649,12 +2649,12 @@ class DailyLimitPlugin(star.Star):
                 )
             )
 
+    @filter.permission_type(PermissionType.ADMIN)
+    @limit_command_group.command("help")
     async def limit_help(self, event: AstrMessageEvent):
         """显示详细帮助信息（仅管理员）"""
         help_msg = self.help_manager.build_full_help()
         event.set_result(MessageEventResult().message(help_msg))
-
-    @filter.permission_type(PermissionType.ADMIN)
     @limit_command_group.command("set")
     async def limit_set(
         self, event: AstrMessageEvent, user_id: str = None, limit: int = None
