@@ -84,44 +84,36 @@ class DailyLimitPlugin(star.Star):
 
         # 初始化核心模块（必须最先初始化，因为其他代码依赖日志）
         if Logger is None or RedisClient is None or ConfigManager is None or Limiter is None or Security is None or UsageTracker is None:
-            # 核心模块导入失败，使用内置实现
-            print("警告: 核心模块导入失败，使用内置实现")
-            self.logger = None
-            self.redis_client = None
-            self.config_mgr = None
-            self.limiter = None
-            self.security = None
-            self.usage_tracker = None
-        else:
-            self.logger = Logger(self)
-            self.redis_client = RedisClient(self)
-            self.config_mgr = ConfigManager(self)
-            self.limiter = Limiter(self)
-            self.security = Security(self)
-            self.usage_tracker = UsageTracker(self)
+            # 核心模块导入失败，无法继续
+            raise RuntimeError(
+                "核心模块导入失败，请确保 core/ 目录存在且包含所有必需模块"
+            )
 
-            # 加载安全配置
-            self.security.load_security_config()
+        # 所有核心模块都可用，进行初始化
+        self.logger = Logger(self)
+        self.redis_client = RedisClient(self)
+        self.config_mgr = ConfigManager(self)
+        self.limiter = Limiter(self)
+        self.security = Security(self)
+        self.usage_tracker = UsageTracker(self)
+
+        # 加载安全配置
+        self.security.load_security_config()
 
         # 加载群组和用户特定限制
-        if self.config_mgr:
-            self.config_mgr.load_limits_from_config()
-            # 将配置数据引用到实例变量，保持向后兼容
-            self.group_limits = self.config_mgr.group_limits
-            self.user_limits = self.config_mgr.user_limits
-            self.group_modes = self.config_mgr.group_modes
-            self.time_period_limits = self.config_mgr.time_period_limits
-            self.skip_patterns = self.config_mgr.skip_patterns
-        else:
-            # 使用内置实现（兼容旧代码）
-            self._load_limits_from_config()
+        self.config_mgr.load_limits_from_config()
+        # 将配置数据引用到实例变量，保持向后兼容
+        self.group_limits = self.config_mgr.group_limits
+        self.user_limits = self.config_mgr.user_limits
+        self.group_modes = self.config_mgr.group_modes
+        self.time_period_limits = self.config_mgr.time_period_limits
+        self.skip_patterns = self.config_mgr.skip_patterns
 
         # 将安全模块数据引用到实例变量，保持向后兼容
-        if self.security:
-            self.abuse_records = self.security.abuse_records
-            self.blocked_users = self.security.blocked_users
-            self.abuse_stats = self.security.abuse_stats
-            self.anti_abuse_enabled = self.security.anti_abuse_enabled
+        self.abuse_records = self.security.abuse_records
+        self.blocked_users = self.security.blocked_users
+        self.abuse_stats = self.security.abuse_stats
+        self.anti_abuse_enabled = self.security.anti_abuse_enabled
 
         # 初始化Redis连接
         self._init_redis()
