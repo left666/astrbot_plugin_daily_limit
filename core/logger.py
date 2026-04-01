@@ -4,8 +4,6 @@
 提供统一的日志记录和错误处理机制。
 """
 
-from astrbot.api import logger
-
 
 class Logger:
     """统一的日志和错误处理类"""
@@ -28,6 +26,9 @@ class Logger:
             message: 日志消息模板
             *args: 格式化参数
         """
+        # 延迟导入，避免模块级导入问题
+        from astrbot.api import logger
+
         log_func = getattr(logger, level, logger.info)
         if args:
             log_func(message.format(*args))
