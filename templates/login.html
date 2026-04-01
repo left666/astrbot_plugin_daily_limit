@@ -1,397 +1,404 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🌸 每日限制插件 - 登录</title>
+    <title>Daily Limit - Login</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        :root {
+            --color-primary: #2563EB;
+            --color-primary-hover: #1D4ED8;
+            --color-primary-light: #DBEAFE;
+            --color-cta: #F97316;
+            --color-success: #16A34A;
+            --color-danger: #DC2626;
+            --bg-body: #F8FAFC;
+            --bg-surface: #FFFFFF;
+            --bg-input: #FFFFFF;
+            --border-default: #E2E8F0;
+            --border-focus: #2563EB;
+            --text-primary: #1E293B;
+            --text-secondary: #64748B;
+            --text-tertiary: #94A3B8;
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.07), 0 2px 4px -2px rgba(0,0,0,0.05);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -4px rgba(0,0,0,0.04);
+            --font-sans: 'Fira Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --font-mono: 'Fira Code', Consolas, monospace;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --transition-fast: 150ms ease;
+            --transition-base: 200ms ease;
         }
-        
+
+        [data-theme="dark"] {
+            --bg-body: #0F172A;
+            --bg-surface: #1E293B;
+            --bg-input: #1E293B;
+            --border-default: #334155;
+            --text-primary: #F1F5F9;
+            --text-secondary: #94A3B8;
+            --text-tertiary: #64748B;
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.3);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.4);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
-            font-family: 'Hiragino Sans GB', 'Microsoft YaHei', 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, #ffb7c5 0%, #ff9eb5 25%, #ff85a1 50%, #ff6b8b 75%, #ff4777 100%);
+            font-family: var(--font-sans);
+            background: var(--bg-body);
+            color: var(--text-primary);
             min-height: 100vh;
-            color: #5a3d5c;
-            position: relative;
-            overflow-x: hidden;
             display: flex;
             align-items: center;
             justify-content: center;
+            padding: 16px;
+            transition: background var(--transition-base), color var(--transition-base);
         }
-        
-        /* 樱花飘落效果 */
-        .sakura {
-            position: absolute;
-            top: -50px;
-            opacity: 0.7;
-            animation: fall linear infinite;
-            z-index: 0;
-            pointer-events: none;
-        }
-        
-        /* 樱花样式1 */
-        .sakura.style1 {
-            width: 30px;
-            height: 30px;
-            background: radial-gradient(circle, #fff 30%, transparent 70%);
-            border-radius: 50% 0 50% 50%;
-        }
-        
-        /* 樱花样式2 */
-        .sakura.style2 {
-            width: 25px;
-            height: 25px;
-            background: radial-gradient(circle, #ffeef2 30%, transparent 70%);
-            border-radius: 50% 50% 0 50%;
-        }
-        
-        /* 樱花样式3 */
-        .sakura.style3 {
-            width: 20px;
-            height: 20px;
-            background: radial-gradient(circle, #fff5f7 30%, transparent 70%);
-            border-radius: 0 50% 50% 50%;
-        }
-        
-        /* 樱花样式4 */
-        .sakura.style4 {
-            width: 35px;
-            height: 35px;
-            background: radial-gradient(circle, #ffeff4 30%, transparent 70%);
-            border-radius: 50% 50% 50% 0;
-        }
-        
-        @keyframes fall {
-            to {
-                transform: translateY(100vh) rotate(360deg);
-                opacity: 0;
-            }
-        }
-        
-        /* 添加左右摇摆效果 */
-        @keyframes sway {
-            0%, 100% {
-                transform: translateX(0px);
-            }
-            50% {
-                transform: translateX(50px);
-            }
-        }
-        
-        /* 不同摇摆幅度的动画 */
-        @keyframes sway1 {
-            0%, 100% {
-                transform: translateX(0px);
-            }
-            50% {
-                transform: translateX(30px);
-            }
-        }
-        
-        @keyframes sway2 {
-            0%, 100% {
-                transform: translateX(0px);
-            }
-            50% {
-                transform: translateX(-30px);
-            }
-        }
-        
-        @keyframes sway3 {
-            0%, 100% {
-                transform: translateX(0px);
-            }
-            50% {
-                transform: translateX(-50px);
-            }
-        }
-        
-        .login-container {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 240, 245, 0.95) 100%);
-            backdrop-filter: blur(15px);
-            border-radius: 20px;
-            padding: 40px;
-            box-shadow: 0 20px 60px rgba(255, 105, 180, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.3);
+
+        .login-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-default);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
             width: 100%;
             max-width: 400px;
-            position: relative;
-            z-index: 1;
+            padding: 40px 32px;
+            transition: background var(--transition-base), border-color var(--transition-base);
         }
-        
-        .login-container::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, #ff9eb5, #ff6b8b, #ff4777);
-            border-radius: 20px 20px 0 0;
-        }
-        
+
         .login-header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 32px;
         }
-        
+
+        .login-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 56px;
+            height: 56px;
+            background: var(--color-primary-light);
+            border-radius: var(--radius-lg);
+            margin-bottom: 16px;
+            color: var(--color-primary);
+        }
+
+        .login-icon svg { width: 28px; height: 28px; }
+
         .login-header h1 {
-            color: #d63384;
-            font-size: 2rem;
-            margin-bottom: 10px;
-            background: linear-gradient(45deg, #d63384, #e83e8c, #fd7e14);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 6px;
         }
-        
+
         .login-header p {
-            color: #8b5a7c;
-            font-size: 1rem;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
         }
-        
-        .login-form {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-        
+
         .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
+            margin-bottom: 20px;
         }
-        
+
         .form-group label {
-            color: #d63384;
+            display: block;
+            margin-bottom: 6px;
+            font-size: 0.875rem;
             font-weight: 600;
-            font-size: 0.9rem;
+            color: var(--text-primary);
         }
-        
-        .form-group input {
-            padding: 12px 15px;
-            border: 2px solid rgba(255, 182, 193, 0.5);
-            border-radius: 10px;
-            font-size: 1rem;
-            background: rgba(255, 255, 255, 0.8);
-            transition: all 0.3s ease;
+
+        .input-wrapper {
+            position: relative;
         }
-        
-        .form-group input:focus {
+
+        .form-input {
+            width: 100%;
+            padding: 10px 42px 10px 14px;
+            border: 1px solid var(--border-default);
+            border-radius: var(--radius-md);
+            background: var(--bg-input);
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            font-family: var(--font-sans);
+            transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
             outline: none;
-            border-color: #ff6b8b;
-            box-shadow: 0 0 0 3px rgba(255, 107, 139, 0.1);
-            background: rgba(255, 255, 255, 0.95);
         }
-        
-        .login-btn {
-            background: linear-gradient(135deg, #ff9eb5, #ff6b8b);
-            color: white;
+
+        .form-input:focus {
+            border-color: var(--border-focus);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 4px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
             border: none;
-            padding: 12px;
-            border-radius: 10px;
-            font-size: 1rem;
-            font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
-            margin-top: 10px;
+            padding: 8px;
+            color: var(--text-tertiary);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color var(--transition-fast);
         }
-        
-        .login-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(255, 105, 180, 0.4);
+
+        .toggle-password:hover { color: var(--text-secondary); }
+        .toggle-password svg { width: 18px; height: 18px; }
+
+        .btn {
+            width: 100%;
+            padding: 10px 16px;
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: 0.95rem;
+            font-weight: 600;
+            font-family: var(--font-sans);
+            cursor: pointer;
+            transition: background var(--transition-fast), transform var(--transition-fast);
         }
-        
-        .error-message {
-            background: linear-gradient(135deg, rgba(255, 220, 220, 0.9) 0%, rgba(255, 200, 200, 0.9) 100%);
-            color: #d63384;
-            padding: 12px;
-            border-radius: 8px;
-            border-left: 4px solid #ff6b8b;
-            font-size: 0.9rem;
-            font-weight: 500;
-            text-align: center;
+
+        .btn-primary {
+            background: var(--color-primary);
+            color: #FFFFFF;
         }
-        
+
+        .btn-primary:hover {
+            background: var(--color-primary-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-primary:active { transform: translateY(0); }
+
+        .error-alert {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 14px;
+            background: #FEE2E2;
+            border: 1px solid #FECACA;
+            border-radius: var(--radius-md);
+            margin-bottom: 20px;
+            font-size: 0.875rem;
+            color: #991B1B;
+        }
+
+        [data-theme="dark"] .error-alert {
+            background: #7F1D1D;
+            border-color: #991B1B;
+            color: #FCA5A5;
+        }
+
+        .error-alert svg { width: 18px; height: 18px; flex-shrink: 0; }
+
         .login-footer {
             text-align: center;
-            margin-top: 20px;
-            color: #8b5a7c;
+            margin-top: 24px;
             font-size: 0.8rem;
+            color: var(--text-tertiary);
         }
-        
-        /* 响应式设计 */
-        @media (max-width: 768px) {
-            .login-container {
-                margin: 30px;
-                padding: 35px;
-                max-width: 350px;
-            }
-            
-            .login-header h1 {
-                font-size: 1.8rem;
+
+        .theme-toggle {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-default);
+            border-radius: var(--radius-md);
+            padding: 8px;
+            cursor: pointer;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background var(--transition-fast), border-color var(--transition-fast);
+            z-index: 10;
+        }
+
+        .theme-toggle:hover { border-color: var(--text-tertiary); }
+        .theme-toggle svg { width: 18px; height: 18px; }
+
+        :focus-visible {
+            outline: 2px solid var(--color-primary);
+            outline-offset: 2px;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                transition-duration: 0.01ms !important;
+                animation-duration: 0.01ms !important;
             }
         }
-        
+
+        .header-actions {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            display: flex;
+            gap: 6px;
+            z-index: 10;
+        }
+
+        .action-btn {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-default);
+            border-radius: var(--radius-md);
+            padding: 8px;
+            cursor: pointer;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background var(--transition-fast), border-color var(--transition-fast);
+        }
+        .action-btn:hover { border-color: var(--text-tertiary); }
+        .action-btn svg { width: 18px; height: 18px; }
+
         @media (max-width: 480px) {
-            .login-container {
-                margin: 20px;
-                padding: 25px 20px;
-                max-width: calc(100% - 40px);
-            }
-            
-            .login-header h1 {
-                font-size: 1.6rem;
-            }
-            
-            .login-header p {
-                font-size: 0.9rem;
-            }
-            
-            .form-group input {
-                padding: 10px 12px;
-                font-size: 0.9rem;
-            }
-            
-            .login-btn {
-                padding: 10px;
-                font-size: 0.9rem;
-            }
-            
-            .login-footer {
-                font-size: 0.75rem;
-            }
-        }
-        
-        /* 小屏幕优化 */
-        @media (max-width: 320px) {
-            .login-container {
-                margin: 10px;
-                padding: 20px 15px;
-                max-width: calc(100% - 20px);
-            }
-            
-            .login-header h1 {
-                font-size: 1.4rem;
-            }
+            .login-card { padding: 32px 24px; }
+            .login-header h1 { font-size: 1.3rem; }
         }
     </style>
 </head>
 <body>
-    <!-- 樱花飘落效果容器 -->
-    <div id="sakuraContainer"></div>
-    
-    <div class="login-container">
+    <div class="header-actions">
+        <button class="action-btn" onclick="toggleLang()" aria-label="Switch language" title="Switch language">
+            <svg id="langIcon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M2 12c2-4 5.5-8 10-8 4.5 4 10 8 10 8"></path><line x1="12" y1="2" x2="12" y2="6"></line></svg>
+        </button>
+        <button class="action-btn" onclick="toggleTheme()" aria-label="Toggle theme">
+            <svg id="themeIcon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        </button>
+    </div>
+
+    <div class="login-card">
         <div class="login-header">
-            <h1>🌸 每日限制插件</h1>
-            <p>请输入密码访问管理界面</p>
+            <div class="login-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+            </div>
+            <h1 data-i18n="title">Daily Limit</h1>
+            <p data-i18n="subtitle"></p>
         </div>
-        
-        <form class="login-form" method="POST">
+
+        <form method="POST">
             {% if error %}
-            <div class="error-message">
-                {{ error }}
+            <div class="error-alert">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
+                <span>{{ error }}</span>
             </div>
             {% endif %}
-            
+
             <div class="form-group">
-                <label for="password">访问密码</label>
-                <div style="position: relative; width: 100%;">
-                    <input type="password" id="password" name="password" placeholder="请输入密码" required style="padding-right: 45px; border-radius: 10px; border: 2px solid rgba(255, 182, 193, 0.5); width: 100%; box-sizing: border-box;">
-                    <button type="button" id="togglePassword" style="position: absolute; right: 2px; top: 50%; transform: translateY(-50%); height: calc(100% - 4px); background: transparent; border: none; cursor: pointer; font-size: 16px; color: #8b5a7c; padding: 0 12px; display: flex; align-items: center; justify-content: center; z-index: 10; border-radius: 0 8px 8px 0;">
-                        👁️
+                <label for="password" data-i18n="password_label"></label>
+                <div class="input-wrapper">
+                    <input type="password" id="password" name="password" class="form-input" data-i18n-placeholder="password_placeholder" required autocomplete="current-password">
+                    <button type="button" class="toggle-password" onclick="togglePassword()" aria-label="Toggle password visibility">
+                        <svg id="eyeIcon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                     </button>
                 </div>
             </div>
-            
-            <button type="submit" class="login-btn">🌸 登录</button>
+
+            <button type="submit" class="btn btn-primary" data-i18n="login_btn"></button>
         </form>
-        
+
         <div class="login-footer">
-            <p>默认密码：limit</p>
+            <p data-i18n="default_password"></p>
         </div>
     </div>
 
     <script>
-        // 樱花飘落效果优化
-        let sakuraCount = 0;
-        const maxSakura = 20; // 限制樱花数量，减少性能消耗
-        const sakuraContainer = document.getElementById('sakuraContainer');
-        
-        function createSakura() {
-            if (sakuraCount >= maxSakura) return;
-            
-            const sakura = document.createElement('div');
-            
-            // 随机选择樱花样式 (1-4)
-            const styleNumber = Math.floor(Math.random() * 4) + 1;
-            sakura.className = `sakura style${styleNumber}`;
-            
-            // 随机位置
-            const left = Math.random() * 100;
-            sakura.style.left = left + 'vw';
-            
-            // 随机动画时长 (15-35秒，更流畅的飘落效果)
-            const duration = Math.random() * 20 + 15;
-            sakura.style.animationDuration = duration + 's';
-            
-            // 随机透明度 (0.2-0.8，更自然的视觉效果)
-            const opacity = Math.random() * 0.6 + 0.2;
-            sakura.style.opacity = opacity;
-            
-            // 随机摇摆效果
-            const swayAnimations = ['sway1', 'sway2', 'sway3'];
-            const swayAnimation = swayAnimations[Math.floor(Math.random() * swayAnimations.length)];
-            sakura.style.animationName = `fall, ${swayAnimation}`;
-            sakura.style.animationDelay = `0s, ${Math.random() * 2}s`;
-            
-            // 随机初始旋转角度
-            const initialRotation = Math.random() * 360;
-            sakura.style.transform = `rotate(${initialRotation}deg)`;
-            
-            // 添加到容器
-            sakuraContainer.appendChild(sakura);
-            sakuraCount++;
-            
-            // 动画结束后移除元素，防止内存泄漏
-            sakura.addEventListener('animationend', function() {
-                sakura.remove();
-                sakuraCount--;
-            });
-        }
-        
-        // 初始创建樱花
-        function initSakuras() {
-            // 初始创建10个樱花，分布在不同时间，避免一次性创建过多
-            for (let i = 0; i < 10; i++) {
-                setTimeout(() => {
-                    createSakura();
-                }, Math.random() * 2000);
+        const I18N = {
+            zh: {
+                title: '每日限制插件',
+                subtitle: '请输入密码访问管理界面',
+                password_label: '访问密码',
+                password_placeholder: '请输入密码',
+                login_btn: '登录',
+                default_password: '默认密码：limit',
+                loading: '加载中...',
+                confirm_logout: '确定要退出登录吗？'
+            },
+            en: {
+                title: 'Daily Limit',
+                subtitle: 'Enter password to access the admin panel',
+                password_label: 'Password',
+                password_placeholder: 'Enter password',
+                login_btn: 'Sign In',
+                default_password: 'Default password: limit',
+                loading: 'Loading...',
+                confirm_logout: 'Are you sure you want to logout?'
             }
+        };
+
+        let lang = localStorage.getItem('lang') || 'zh';
+
+        function t(key) { return (I18N[lang] && I18N[lang][key]) || key; }
+
+        function applyI18N() {
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                el.textContent = t(key);
+            });
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+                const key = el.getAttribute('data-i18n-placeholder');
+                el.setAttribute('placeholder', t(key));
+            });
+            document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en';
         }
-        
-        // 持续创建樱花，每800毫秒创建一个，控制创建频率
-        setInterval(createSakura, 800);
-        
-        // 初始化樱花效果
-        initSakuras();
-        
-        // 自动聚焦密码输入框
+
+        function toggleLang() {
+            lang = lang === 'zh' ? 'en' : 'zh';
+            localStorage.setItem('lang', lang);
+            applyI18N();
+        }
+
+        function initLang() {
+            lang = localStorage.getItem('lang') || 'zh';
+            applyI18N();
+        }
+
         document.getElementById('password').focus();
-        
-        // 密码可见性切换功能
-        const togglePasswordBtn = document.getElementById('togglePassword');
-        const passwordInput = document.getElementById('password');
-        
-        togglePasswordBtn.addEventListener('click', () => {
-            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-            passwordInput.setAttribute('type', type);
-            togglePasswordBtn.textContent = type === 'password' ? '👁️' : '🙈';
-        });
+
+        function togglePassword() {
+            const input = document.getElementById('password');
+            const isPassword = input.type === 'password';
+            input.type = isPassword ? 'text' : 'password';
+            document.getElementById('eyeIcon').innerHTML = isPassword
+                ? '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>'
+                : '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>';
+        }
+
+        function initTheme() {
+            const saved = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', saved);
+            updateThemeIcon(saved);
+        }
+
+        function toggleTheme() {
+            const current = document.documentElement.getAttribute('data-theme');
+            const next = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', next);
+            localStorage.setItem('theme', next);
+            updateThemeIcon(next);
+        }
+
+        function updateThemeIcon(theme) {
+            const icon = document.getElementById('themeIcon');
+            icon.innerHTML = theme === 'dark'
+                ? '<circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>'
+                : '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>';
+        }
+
+        initTheme();
+        initLang();
     </script>
 </body>
 </html>

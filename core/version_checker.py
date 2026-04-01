@@ -103,7 +103,7 @@ class VersionChecker:
             self.last_checked_version_info = version_info  # 存储完整的版本信息
 
             # 比较版本号
-            current_version = self.plugin.config.get("version", "v2.8.8")
+            current_version = self.plugin.config.get("version", "v2.8.9")
             if self._compare_versions(version_info["version"], current_version) > 0:
                 # 检测到新版本
                 self.logger.log_info(
