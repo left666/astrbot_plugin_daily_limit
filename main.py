@@ -95,7 +95,7 @@ except Exception as e:
     name="daily_limit",
     desc="限制用户每日调用大模型的次数",
     author="left666 & Sakura520222",
-    version="v2.8.7",
+    version="v2.8.8",
     repo="https://github.com/left666/astrbot_plugin_daily_limit",
 )
 class DailyLimitPlugin(star.Star):
@@ -1814,7 +1814,7 @@ class DailyLimitPlugin(star.Star):
     async def limit_help_all(self, event: AstrMessageEvent):
         """显示本插件所有指令及其帮助信息"""
         help_msg = (
-            "🚀 日调用限制插件 v2.8.7 - 完整指令帮助\n"
+            "🚀 日调用限制插件 v2.8.8 - 完整指令帮助\n"
             "═════════════════════════\n\n"
             "👤 用户指令（所有人可用）：\n"
             "├── /limit_status - 查看您今日的使用状态和剩余次数\n"
@@ -1878,7 +1878,7 @@ class DailyLimitPlugin(star.Star):
             "• 管理员可使用 /limit help 查看详细管理命令\n"
             "• 时间段限制优先级最高，会覆盖其他限制规则\n"
             "• 默认忽略模式：#、*（可自定义添加）\n\n"
-            "📝 版本信息：v2.8.7 | 作者：left666 | 改进：Sakura520222\n"
+            "📝 版本信息：v2.8.8 | 作者：left666 | 改进：Sakura520222\n"
             "═════════════════════════"
         )
 
@@ -3479,7 +3479,7 @@ class DailyLimitPlugin(star.Star):
             await self.version_checker.check_version_update()
 
             # 检查是否有新版本
-            current_version = self.config.get("version", "v2.8.7")
+            current_version = self.config.get("version", "v2.8.8")
             if self.version_checker.last_checked_version:
                 if (
                     self.version_checker._compare_versions(self.version_checker.last_checked_version, current_version)
@@ -3526,7 +3526,7 @@ class DailyLimitPlugin(star.Star):
     async def limit_version(self, event: AstrMessageEvent):
         """查看当前插件版本信息（仅管理员）"""
         try:
-            current_version = self.config.get("version", "v2.8.7")
+            current_version = self.config.get("version", "v2.8.8")
 
             # 构建版本信息消息
             version_msg = "📦 日调用限制插件版本信息\n"
@@ -3577,7 +3577,7 @@ class DailyLimitPlugin(star.Star):
 ░░░░░░░░░░   ░░░░░   ░░░░░ ░░░░░ ░░░░░░░░░░░    ░░░░░       ░░░░░░░░░░░ ░░░░░ ░░░░░     ░░░░░ ░░░░░    ░░░░░    
                                                                                                                 
                                                                                                                                                                                                       
-                                       每日调用限制插件 v2.8.7                       
+                                       每日调用限制插件 v2.8.8                       
                                   作者: left666 & Sakura520222                  
     """
 

@@ -192,13 +192,13 @@ class HelpManager:
     def build_version_info_help(self) -> str:
         """构建版本信息帮助信息"""
         return (
-            "\n📝 版本信息：v2.8.7 | 作者：left666 | 改进：Sakura520222\n"
+            "\n📝 版本信息：v2.8.8 | 作者：left666 | 改进：Sakura520222\n"
             "═════════════════════════"
         )
 
     def build_full_help(self) -> str:
         """构建完整的帮助信息"""
-        help_msg = "🚀 日调用限制插件 v2.8.7 - 管理员详细帮助\n"
+        help_msg = "🚀 日调用限制插件 v2.8.8 - 管理员详细帮助\n"
         help_msg += "═════════════════════════\n\n"
 
         # 组合所有帮助信息
