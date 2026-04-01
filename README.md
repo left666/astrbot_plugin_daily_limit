@@ -1,4 +1,4 @@
-# AstrBot 日调用限制插件
+# AstrBot 日调用限制插件(重构版)
 
 <div align="center">
 
