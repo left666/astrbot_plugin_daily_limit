@@ -8,7 +8,7 @@ Web管理界面服务器
 - 实时统计信息监控
 - 密码保护的安全访问
 
-版本: v2.8.7
+版本: v2.8.9
 作者: Sakura520222
 """
 
@@ -859,6 +859,16 @@ class WebServer:
             else:
                 raise ValueError(f"{list_name}必须是字符串列表")
 
+    def _update_list_config(self, config_data, config_key):
+        """更新列表类型的配置"""
+        if config_key in config_data:
+            value = config_data[config_key]
+            if isinstance(value, list):
+                valid_items = [str(item).strip() for item in value if str(item).strip()]
+                self.plugin.config["limits"][config_key] = valid_items
+            else:
+                raise ValueError(f"{config_key}必须是列表格式")
+
     def _update_string_config(self, config_data, config_key):
         """
         更新字符串类型的配置
@@ -994,10 +1004,12 @@ class WebServer:
             "user_limits",
             "group_mode_settings",
             "time_period_limits",
-            "skip_patterns",
         ]
         for config_key in string_configs:
             self._update_string_config(config_data, config_key)
+
+        # 更新列表类型的配置
+        self._update_list_config(config_data, "skip_patterns")
 
         # 更新自定义消息
         self._update_custom_messages(config_data)

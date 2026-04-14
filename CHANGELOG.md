@@ -1,3 +1,32 @@
+### v2.8.9（2026.04.08）
+
+#### Bug修复与文档更新
+- **修正skip_patterns配置更新逻辑** - 修复Web管理界面中skip_patterns配置保存失败的问题
+- **更新插件作者信息** - 更新metadata中的作者信息
+
+### v2.8.8（2026.03.26 - 2026.04.01）
+
+#### 核心架构重构
+
+##### 模块化架构重构（五阶段）
+- **第一阶段** - 拆分日志模块（logger）和Redis客户端（redis_client）到core目录
+- **第二阶段** - 拆分配置管理（config_manager）和限制逻辑（limiter）到core目录
+- **第三阶段** - 拆分使用记录统计（usage_tracker、stats_analyzer）和安全检测（security）到core目录
+- **第四阶段** - 拆分消息构建器（message_builder）和版本检查（version_checker）到core目录
+- **第五阶段** - 拆分高级辅助模块（help_manager、security_handler、messages_handler、time_period_manager、web_manager）到core目录
+
+##### 新增模块
+- **config_loader** - 独立配置加载模块，优化配置初始化流程
+- **redis_keys** - Redis键名管理模块，统一键名规范
+
+##### WebUI重构
+- **重构WebUI界面** - 优化Web管理界面布局和交互体验
+
+##### 修复问题
+- **修复limit help命令装饰器问题** - 修复命令缺少装饰器导致的注册失败
+- **修复核心模块导入问题** - 使用importlib从特定路径加载核心模块，解决模块级导入依赖
+- **修复异步方法兼容性** - 将_build_basic_management_help改为异步方法
+
 ### v2.8.7（2026.03.26）
 #### 请求处理逻辑优化
 ##### 核心优化
@@ -320,12 +349,12 @@
 - **智能模板处理** - 自动处理模板变量错误，确保消息格式正确
 
 #### 🔧 管理员命令扩展
-| 命令 | 功能 | 示例 |
-|------|------|------|
-| `/limit messages list` | 查看所有可自定义的消息类型 | `/limit messages list` |
-| `/limit messages set <类型> <消息>` | 设置特定类型的自定义消息 | `/limit messages set limit_status_private 您的使用状态：{usage}/{limit} {progress_bar}` |
-| `/limit messages reset <类型>` | 重置指定类型的消息为默认 | `/limit messages reset limit_status_private` |
-| `/limit messages reset_all` | 重置所有消息为默认 | `/limit messages reset_all` |
+| 命令                                | 功能                       | 示例                                                                                    |
+| ----------------------------------- | -------------------------- | --------------------------------------------------------------------------------------- |
+| `/limit messages list`              | 查看所有可自定义的消息类型 | `/limit messages list`                                                                  |
+| `/limit messages set <类型> <消息>` | 设置特定类型的自定义消息   | `/limit messages set limit_status_private 您的使用状态：{usage}/{limit} {progress_bar}` |
+| `/limit messages reset <类型>`      | 重置指定类型的消息为默认   | `/limit messages reset limit_status_private`                                            |
+| `/limit messages reset_all`         | 重置所有消息为默认         | `/limit messages reset_all`                                                             |
 
 #### 💡 使用说明
 - **消息类型**：支持 `zero_usage_message`、`zero_usage_group_shared_message`、`zero_usage_group_individual_message`、`limit_status_private_message`、`limit_status_group_shared_message`、`limit_status_group_individual_message`、`limit_status_exempt_message`、`limit_status_time_period_message`
@@ -340,11 +369,11 @@
 - **管理员命令支持** - 新增/limit custom_messages系列命令用于管理自定义消息
 
 #### 🔧 管理员命令扩展
-| 命令 | 功能 | 示例 |
-|------|------|------|
-| `/limit custom_messages get` | 查看当前自定义消息配置 | `/limit custom_messages get` |
+| 命令                                       | 功能                     | 示例                                                |
+| ------------------------------------------ | ------------------------ | --------------------------------------------------- |
+| `/limit custom_messages get`               | 查看当前自定义消息配置   | `/limit custom_messages get`                        |
 | `/limit custom_messages set <类型> <消息>` | 设置特定类型的自定义消息 | `/limit custom_messages set private 今日次数已用完` |
-| `/limit custom_messages reset` | 重置为默认消息 | `/limit custom_messages reset` |
+| `/limit custom_messages reset`             | 重置为默认消息           | `/limit custom_messages reset`                      |
 
 #### 💡 使用说明
 - **消息类型**：支持 `private`（私聊）、`group_shared`（群组共享模式）、`group_individual`（群组独立模式）

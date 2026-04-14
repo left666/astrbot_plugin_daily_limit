@@ -1,8 +1,8 @@
-# AstrBot 日调用限制插件
+# AstrBot 日调用限制插件(重构版)
 
 <div align="center">
 
-![Version](https://img.shields.io/badge/版本-v2.8.7-blue)
+![Version](https://img.shields.io/badge/版本-v2.8.9-blue)
 ![AstrBot](https://img.shields.io/badge/AstrBot-3.5.1%2B-green)
 ![Python](https://img.shields.io/badge/Python-3.10%2B-yellow)
 ![License](https://img.shields.io/badge/License-MIT-orange)
@@ -28,25 +28,40 @@
 > 
 > 请注意，自v2.5.1版本起，Web管理界面功能已正式发布并稳定运行。我们已经解决了之前版本中存在的bug，并对系统进行了全面优化和测试，确保在生产环境中的稳定性和可靠性。
 
-> ⚠️ **重要提醒：配置结构已更改（v2.6.5+）**
-> 
-> **自v2.6.5版本起，配置结构已发生重大变更！** 为了提升配置管理的易用性和可读性，以下配置项已从JSON数组格式改为文本格式：
-> 
-> - **特定群组限制** (`group_limits`)
-> - **群组模式配置** (`group_mode_settings`)  
-> - **特定用户限制** (`user_limits`)
-> - **时间段限制配置** (`time_period_limits`)
-> 
-> **升级注意事项：**
-> - 如果您是从旧版本升级，请**重新配置**上述配置项
-> - 插件会自动处理新旧格式的转换，但建议重新配置以确保最佳体验
-> - 豁免用户配置 (`exempt_users`) 仍保持列表格式，无需重新配置
+> ⚠️ **重要提醒：
+> 本项目为维护重构版，原项目地址：https://github.com/left666/astrbot_plugin_daily_limit
 
 ## 简介
 
 AstrBot 日调用限制插件是专为AstrBot设计的AI资源管理工具，通过智能的每日调用限制机制，有效防止大模型API滥用，确保AI服务的稳定性和公平性。
 
 ## 版本更新
+
+### v2.8.9（2026.04.08）
+#### Bug修复与文档更新
+- **修正skip_patterns配置更新逻辑** - 修复Web管理界面中skip_patterns配置保存失败的问题
+- **更新插件作者信息** - 更新metadata中的作者信息
+
+### v2.8.8（2026.03.26 - 2026.04.01）
+#### 核心架构重构
+##### 模块化架构重构（五阶段）
+- **第一阶段** - 拆分日志模块（logger）和Redis客户端（redis_client）到core目录
+- **第二阶段** - 拆分配置管理（config_manager）和限制逻辑（limiter）到core目录
+- **第三阶段** - 拆分使用记录统计（usage_tracker、stats_analyzer）和安全检测（security）到core目录
+- **第四阶段** - 拆分消息构建器（message_builder）和版本检查（version_checker）到core目录
+- **第五阶段** - 拆分高级辅助模块（help_manager、security_handler、messages_handler、time_period_manager、web_manager）到core目录
+
+##### 新增模块
+- **config_loader** - 独立配置加载模块，优化配置初始化流程
+- **redis_keys** - Redis键名管理模块，统一键名规范
+
+##### WebUI重构
+- **重构WebUI界面** - 优化Web管理界面布局和交互体验
+
+##### 修复问题
+- **修复limit help命令装饰器问题** - 修复命令缺少装饰器导致的注册失败
+- **修复核心模块导入问题** - 使用importlib从特定路径加载核心模块，解决模块级导入依赖
+- **修复异步方法兼容性** - 将_build_basic_management_help改为异步方法
 
 ### v2.8.7（2026.03.26）
 #### 请求处理逻辑优化
@@ -60,7 +75,7 @@ AstrBot 日调用限制插件是专为AstrBot设计的AI资源管理工具，通
 - **解决别名解析错误** - 修复了add等后缀被识别为"别名"，且每个字母被拆开单独视为一个别名的问题
 - **确保重启后保持正确** - 修复了手动改正后重启插件，指令名会重新加载成错误形式的问题
 
-[更新日志](./change_log.md)
+[更新日志](./CHANGELOG.md)
 
 ---
 
@@ -358,103 +373,103 @@ Redis是插件的数据存储后端，必须正确配置才能正常运行。
 
 ### 用户命令
 
-| 命令 | 功能 | 示例 |
-|------|------|------|
+| 命令            | 功能             | 示例            |
+| --------------- | ---------------- | --------------- |
 | `/limit_status` | 查看个人使用情况 | `/limit_status` |
-| `/限制帮助` | 显示所有可用命令 | `/限制帮助` |
+| `/限制帮助`     | 显示所有可用命令 | `/限制帮助`     |
 
 ### 管理员命令
 
 #### 基础配置管理
-| 命令 | 功能 | 示例 |
-|------|------|------|
-| `/limit help` | 显示详细帮助 | `/limit help` |
+| 命令                         | 功能         | 示例                   |
+| ---------------------------- | ------------ | ---------------------- |
+| `/limit help`                | 显示详细帮助 | `/limit help`          |
 | `/limit set <用户ID> <次数>` | 设置用户限制 | `/limit set 123456 50` |
-| `/limit setgroup <次数>` | 设置群组限制 | `/limit setgroup 30` |
-| `/limit setmode <shared|individual>` | 设置群组模式 | `/limit setmode shared` |
-| `/limit getmode` | 查看群组模式 | `/limit getmode` |
+| `/limit setgroup <次数>`     | 设置群组限制 | `/limit setgroup 30`   |
+| `/limit setmode <shared      | individual>` | 设置群组模式           | `/limit setmode shared` |
+| `/limit getmode`             | 查看群组模式 | `/limit getmode`       |
 
 #### 豁免用户管理
-| 命令 | 功能 | 示例 |
-|------|------|------|
-| `/limit exempt <用户ID>` | 添加豁免用户 | `/limit exempt 123456` |
+| 命令                       | 功能         | 示例                     |
+| -------------------------- | ------------ | ------------------------ |
+| `/limit exempt <用户ID>`   | 添加豁免用户 | `/limit exempt 123456`   |
 | `/limit unexempt <用户ID>` | 移除豁免用户 | `/limit unexempt 123456` |
 
 #### 时间段限制管理
-| 命令 | 功能 | 示例 |
-|------|------|------|
-| `/limit timeperiod list` | 列出时间段限制 | `/limit timeperiod list` |
-| `/limit timeperiod add <开始> <结束> <次数>` | 添加时间段 | `/limit timeperiod add 09:00 18:00 10` |
-| `/limit timeperiod remove <索引>` | 删除时间段 | `/limit timeperiod remove 1` |
-| `/limit timeperiod enable <索引>` | 启用时间段 | `/limit timeperiod enable 1` |
-| `/limit timeperiod disable <索引>` | 禁用时间段 | `/limit timeperiod disable 1` |
+| 命令                                         | 功能           | 示例                                   |
+| -------------------------------------------- | -------------- | -------------------------------------- |
+| `/limit timeperiod list`                     | 列出时间段限制 | `/limit timeperiod list`               |
+| `/limit timeperiod add <开始> <结束> <次数>` | 添加时间段     | `/limit timeperiod add 09:00 18:00 10` |
+| `/limit timeperiod remove <索引>`            | 删除时间段     | `/limit timeperiod remove 1`           |
+| `/limit timeperiod enable <索引>`            | 启用时间段     | `/limit timeperiod enable 1`           |
+| `/limit timeperiod disable <索引>`           | 禁用时间段     | `/limit timeperiod disable 1`          |
 
 #### 查询功能
-| 命令 | 功能 | 示例 |
-|------|------|------|
-| `/limit list_user` | 列出用户限制 | `/limit list_user` |
-| `/limit list_group` | 列出群组限制 | `/limit list_group` |
-| `/limit stats` | 查看今日统计 | `/limit stats` |
-| `/limit history [用户ID] [天数]` | 查询使用历史 | `/limit history 123456 7` |
-| `/limit analytics [日期]` | 多维度分析 | `/limit analytics 2025-01-23` |
-| `/limit top [数量]` | 显示排行榜 | `/limit top 5` |
-| `/limit status` | 查看插件状态 | `/limit status` |
-| `/limit domain` | 查看Web管理界面域名配置 | `/limit domain` |
+| 命令                             | 功能                    | 示例                          |
+| -------------------------------- | ----------------------- | ----------------------------- |
+| `/limit list_user`               | 列出用户限制            | `/limit list_user`            |
+| `/limit list_group`              | 列出群组限制            | `/limit list_group`           |
+| `/limit stats`                   | 查看今日统计            | `/limit stats`                |
+| `/limit history [用户ID] [天数]` | 查询使用历史            | `/limit history 123456 7`     |
+| `/limit analytics [日期]`        | 多维度分析              | `/limit analytics 2025-01-23` |
+| `/limit top [数量]`              | 显示排行榜              | `/limit top 5`                |
+| `/limit status`                  | 查看插件状态            | `/limit status`               |
+| `/limit domain`                  | 查看Web管理界面域名配置 | `/limit domain`               |
 
 #### 重置功能
-| 命令 | 功能 | 示例 |
-|------|------|------|
-| `/limit reset all` | 重置所有记录 | `/limit reset all` |
-| `/limit reset <用户ID>` | 重置特定用户 | `/limit reset 123456` |
+| 命令                          | 功能         | 示例                        |
+| ----------------------------- | ------------ | --------------------------- |
+| `/limit reset all`            | 重置所有记录 | `/limit reset all`          |
+| `/limit reset <用户ID>`       | 重置特定用户 | `/limit reset 123456`       |
 | `/limit reset group <群组ID>` | 重置特定群组 | `/limit reset group 789012` |
 
 #### 重置时间配置 (v2.6.7+)
-| 命令 | 功能 | 示例 |
-|------|------|------|
-| `/limit resettime get` | 查看当前重置时间配置 | `/limit resettime get` |
-| `/limit resettime set <时间>` | 设置自定义重置时间 | `/limit resettime set 06:00` |
-| `/limit resettime reset` | 重置为默认时间（00:00） | `/limit resettime reset` |
+| 命令                          | 功能                    | 示例                         |
+| ----------------------------- | ----------------------- | ---------------------------- |
+| `/limit resettime get`        | 查看当前重置时间配置    | `/limit resettime get`       |
+| `/limit resettime set <时间>` | 设置自定义重置时间      | `/limit resettime set 06:00` |
+| `/limit resettime reset`      | 重置为默认时间（00:00） | `/limit resettime reset`     |
 
 #### 忽略模式管理 (v2.4+)
-| 命令 | 功能 | 示例 |
-|------|------|------|
-| `/limit skip_patterns` | 查看当前忽略模式 | `/limit skip_patterns` |
-| `/limit skip_patterns add <模式>` | 添加忽略模式 | `/limit skip_patterns add !` |
-| `/limit skip_patterns remove <模式>` | 移除忽略模式 | `/limit skip_patterns remove #` |
-| `/limit skip_patterns reset` | 重置为默认模式 | `/limit skip_patterns reset` |
+| 命令                                 | 功能             | 示例                            |
+| ------------------------------------ | ---------------- | ------------------------------- |
+| `/limit skip_patterns`               | 查看当前忽略模式 | `/limit skip_patterns`          |
+| `/limit skip_patterns add <模式>`    | 添加忽略模式     | `/limit skip_patterns add !`    |
+| `/limit skip_patterns remove <模式>` | 移除忽略模式     | `/limit skip_patterns remove #` |
+| `/limit skip_patterns reset`         | 重置为默认模式   | `/limit skip_patterns reset`    |
 
 #### 消息自定义管理 (v2.6.0+)
-| 命令 | 功能 | 示例 |
-|------|------|------|
-| `/limit messages list` | 查看所有可自定义的消息类型 | `/limit messages list` |
-| `/limit messages set <类型> <消息>` | 设置特定类型的自定义消息 | `/limit messages set private 今日次数已用完` |
-| `/limit messages reset <类型>` | 重置指定类型的消息为默认 | `/limit messages reset private` |
-| `/limit messages reset_all` | 重置所有消息为默认 | `/limit messages reset_all` |
-| `/limit custom_messages get` | 查看当前自定义消息配置 | `/limit custom_messages get` |
-| `/limit custom_messages set <类型> <消息>` | 设置特定类型的自定义消息 | `/limit custom_messages set private 今日次数已用完` |
-| `/limit custom_messages reset` | 重置为默认消息 | `/limit custom_messages reset` |
+| 命令                                       | 功能                       | 示例                                                |
+| ------------------------------------------ | -------------------------- | --------------------------------------------------- |
+| `/limit messages list`                     | 查看所有可自定义的消息类型 | `/limit messages list`                              |
+| `/limit messages set <类型> <消息>`        | 设置特定类型的自定义消息   | `/limit messages set private 今日次数已用完`        |
+| `/limit messages reset <类型>`             | 重置指定类型的消息为默认   | `/limit messages reset private`                     |
+| `/limit messages reset_all`                | 重置所有消息为默认         | `/limit messages reset_all`                         |
+| `/limit custom_messages get`               | 查看当前自定义消息配置     | `/limit custom_messages get`                        |
+| `/limit custom_messages set <类型> <消息>` | 设置特定类型的自定义消息   | `/limit custom_messages set private 今日次数已用完` |
+| `/limit custom_messages reset`             | 重置为默认消息             | `/limit custom_messages reset`                      |
 
 #### 版本检查管理 (v2.7.0+)
-| 命令 | 功能 | 示例 |
-|------|------|------|
-| `/limit checkupdate` | 手动检查版本更新 | `/limit checkupdate` |
-| `/limit version` | 查看当前插件版本信息 | `/limit version` |
+| 命令                 | 功能                 | 示例                 |
+| -------------------- | -------------------- | -------------------- |
+| `/limit checkupdate` | 手动检查版本更新     | `/limit checkupdate` |
+| `/limit version`     | 查看当前插件版本信息 | `/limit version`     |
 
 #### 防刷功能管理 (v2.7.1+)
-| 命令 | 功能 | 示例 |
-|------|------|------|
-| `/limit security status` | 查看防刷功能状态 | `/limit security status` |
-| `/limit security enable` | 启用防刷功能 | `/limit security enable` |
-| `/limit security disable` | 禁用防刷功能 | `/limit security disable` |
-| `/limit security config` | 查看防刷配置详情 | `/limit security config` |
-| `/limit security unblock <用户ID>` | 解除用户限制 | `/limit security unblock 123456` |
-| `/limit security blocklist` | 查看当前被限制用户列表 | `/limit security blocklist` |
+| 命令                               | 功能                   | 示例                             |
+| ---------------------------------- | ---------------------- | -------------------------------- |
+| `/limit security status`           | 查看防刷功能状态       | `/limit security status`         |
+| `/limit security enable`           | 启用防刷功能           | `/limit security enable`         |
+| `/limit security disable`          | 禁用防刷功能           | `/limit security disable`        |
+| `/limit security config`           | 查看防刷配置详情       | `/limit security config`         |
+| `/limit security unblock <用户ID>` | 解除用户限制           | `/limit security unblock 123456` |
+| `/limit security blocklist`        | 查看当前被限制用户列表 | `/limit security blocklist`      |
 
 #### 趋势分析功能 (v2.7.3+)
-| 命令 | 功能 | 示例 |
-|------|------|------|
-| `/limit trends` | 查看趋势分析Web管理界面访问地址 | `/limit trends` |
-| `/limit trends_api <周期>` | 获取趋势分析API数据 | `/limit trends_api week` |
+| 命令                       | 功能                            | 示例                     |
+| -------------------------- | ------------------------------- | ------------------------ |
+| `/limit trends`            | 查看趋势分析Web管理界面访问地址 | `/limit trends`          |
+| `/limit trends_api <周期>` | 获取趋势分析API数据             | `/limit trends_api week` |
 
 **趋势分析功能说明：**
 - Web界面访问：通过`/limit trends`命令获取Web管理界面地址，登录后可查看趋势分析图表
